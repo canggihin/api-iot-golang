@@ -9,7 +9,11 @@ pipeline {
     }
     
     stages {
-
+        stage('who am i') {
+            steps {
+                sh 'whoami'
+            }
+        }
         stage('Skip pattern') {
             steps {
                 script {
