@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  app:
+    environment:
+      - ORG_INFLUX=${ORG_INFLUX}
+      - BUCKET_INFLUX=${BUCKET_INFLUX}
+      - URL_INFLUX=${URL_INFLUX}
+      - TOKEN_INFLUX=${TOKEN_INFLUX}
+    image: argyarijal/mqtt-client-ta:latest
+    build: .
+    ports:
+      - "8787:8080"
+    restart: unless-stopped
