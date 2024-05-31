@@ -26,16 +26,6 @@ pipeline {
             }
         }
 
-        stage('Remove Docker Compose') {
-            steps {
-                script {
-                    sh '''
-                    docker compose down --remove-orphans -v
-                    '''
-                }
-            }
-        }
-
         stage('Docker Build and Push') {
             steps {
                 withDockerRegistry([credentialsId: "docker-creds", url: ""]) {
