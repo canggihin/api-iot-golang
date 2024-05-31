@@ -17,3 +17,5 @@ services:
 networks:
   db-network:
     external: true
+  service-networks:
+    external: true
