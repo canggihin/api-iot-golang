@@ -52,8 +52,6 @@ pipeline {
 
         stage('Prune Docker Data') {
             steps {
-                sh 'docker system prune -a --volumes -f'
-                // Stop and remove the old container if it exists
                 sh '''
                 if [ $(docker ps -a -q -f name=${CONTAINER_NAME}) ]; then
                     docker stop ${CONTAINER_NAME} || true
