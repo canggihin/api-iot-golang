@@ -62,17 +62,11 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy') {
+        stage('Deploy to portainer') {
             steps {
                 script {
-                    
-                    // Pull the latest image
-                    sh 'docker pull ${IMAGE_NAME}'
-
-                    // Run the new container with the correct volume mount
-                    sh '''
-                    docker compose up -d
-                    '''
+                sh "curl -X POST https://193.203.167.97:9443/api/stacks/webhooks/669b8cc0-8a8c-4e42-95af-177fb47e825a"
+                echo "Deployed to Portainer"
                 }
             }
         }
