@@ -7,7 +7,13 @@ services:
       - BUCKET_INFLUX=${BUCKET_INFLUX}
       - URL_INFLUX=${URL_INFLUX}
       - TOKEN_INFLUX=${TOKEN_INFLUX}
-    build: .
+    networks:
+      - db-network
+      - service-networks
     ports:
       - "8787:8080"
     restart: unless-stopped
+
+networks:
+  db-network:
+    external: true
