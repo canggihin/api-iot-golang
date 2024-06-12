@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
@@ -66,11 +67,7 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorDataResponse, 
 	for result.Next() {
 		var data models.SensorDataResponse
 		values := result.Record().Values()
-		data.Temperature = values["temperature"].(string)
-		data.Humidity = values["humidity"].(string)
-		data.Message = values["message"].(string)
-		data.RainWasFall = values["rain_was_fall"].(string)
-		data.Pressure = values["pressure"].(string)
+		log.Println("values: ", values)
 
 		resultData = append(resultData, data)
 	}
