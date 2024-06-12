@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
@@ -62,31 +61,45 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		return nil, err
 	}
 
+	dataMap := make(map[time.Time]*models.SensorData)
 	var resultData []models.SensorData
 	for result.Next() {
 		values := result.Record().Values()
-		log.Println("values: ", values)
+		timestamp := result.Record().Time() // Get the timestamp of the record
+		if dataMap[timestamp] == nil {
+			dataMap[timestamp] = &models.SensorData{} // Initialize if not already
+		}
+		data := dataMap[timestamp]
 
-		// Create a new instance of SensorDataResponse for each record
-		var data models.SensorData
-		if temp, ok := values["_value"].(float64); ok && values["_field"].(string) == "temperature" {
-			data.Temperature = temp
+		// Assign data based on field type
+		switch values["_field"].(string) {
+		case "temperature":
+			if temp, ok := values["_value"].(float64); ok {
+				data.Temperature = temp
+			}
+		case "humidity":
+			if humidity, ok := values["_value"].(float64); ok {
+				data.Humidity = humidity
+			}
+		case "message":
+			if message, ok := values["_value"].(string); ok {
+				data.Message = message
+			}
+		case "rain_was_fall":
+			if rainWasFall, ok := values["_value"].(float64); ok {
+				data.RainWasFall = rainWasFall
+			}
+		case "pressure":
+			if pressure, ok := values["_value"].(float64); ok {
+				data.Pressure = pressure
+			}
 		}
-		if humidity, ok := values["_value"].(float64); ok && values["_field"].(string) == "humidity" {
-			data.Humidity = humidity
-		}
-		if message, ok := values["_value"].(string); ok && values["_field"].(string) == "message" {
-			data.Message = message
-		}
-		if rainWasFall, ok := values["_value"].(float64); ok && values["_field"].(string) == "rain_was_fall" {
-			data.RainWasFall = rainWasFall
-		}
-		if pressure, ok := values["_value"].(float64); ok && values["_field"].(string) == "pressure" {
-			data.Pressure = pressure
-		}
-
-		// Append the populated struct to the result slice
-		resultData = append(resultData, data)
 	}
+
+	// Transfer from map to slice
+	for _, d := range dataMap {
+		resultData = append(resultData, *d)
+	}
+
 	return resultData, nil
 }
