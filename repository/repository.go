@@ -156,5 +156,9 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDa
 		}
 	}
 
+	for _, d := range dataMap {
+		resultData = append(resultData, *d)
+	}
+
 	return resultData, nil
 }
