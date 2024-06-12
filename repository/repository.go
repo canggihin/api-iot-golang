@@ -63,12 +63,14 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		return nil, err
 	}
 
+	gmt7Offset := time.Hour * 7
 	dataMap := make(map[string]*models.SensorData)
 	var resultData []models.SensorData
 	for result.Next() {
 		values := result.Record().Values()
 		timestamp := result.Record().Time()
-		formattedTime := timestamp.Format("02-01-2006 15:04:05")
+		gmt7Time := timestamp.Add(gmt7Offset)
+		formattedTime := gmt7Time.Format("02-01-2006 15:04:05")
 		fmt.Println("UTC Time:", timestamp.String())
 		if dataMap[formattedTime] == nil {
 			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
