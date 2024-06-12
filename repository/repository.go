@@ -114,15 +114,11 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
 	query := `
     from(bucket: "rainfall_data")
-    |> range(start: -inf)
-    |> filter(fn: (r) => r._measurement == "rainfall")
-    |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
-    |> pivot(
-        rowKey:["_time"],
-        columnKey: ["_field"],
-        valueColumn: "_value"
-    )
-    |> sort(columns: ["_time"], desc: true)
+		|> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+		|> filter(fn: (r) => r["_measurement"] == "rainfall")
+		|> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pressure" or r["_field"] == "temperature")
+		|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+		|> yield(name: "mean")
     `
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
@@ -136,11 +132,8 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
 		timestamp := result.Record().Time()
 		formattedTime := timestamp.Format("02-01-2006")
 
-		// Create a new SensorData for each record
 		log.Println("data result :", values)
 		log.Println("timestamp :", formattedTime)
-		// Append the data to the result slice
-		// resultData = append(resultData, data)
 	}
 
 	return resultData, nil
