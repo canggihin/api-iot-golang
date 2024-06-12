@@ -115,7 +115,7 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
 	query := `
     from(bucket: "rainfall_data")
-		|> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+		|> range(start: -inf)
 		|> filter(fn: (r) => r["_measurement"] == "rainfall")
 		|> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pressure" or r["_field"] == "temperature")
 		|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
