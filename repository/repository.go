@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
@@ -122,7 +123,7 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
     `
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error querying data: %v", err)
 	}
 
 	var resultData []models.SensorData
