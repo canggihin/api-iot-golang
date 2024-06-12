@@ -12,7 +12,7 @@ import (
 type Service interface {
 	InsertData(ctx context.Context, data models.SensorData) error
 	GetData(ctx context.Context) ([]models.SensorData, error)
-	GetDataByDay(ctx context.Context) ([]models.SensorData, error)
+	GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error)
 }
 
 type service struct {
@@ -57,7 +57,7 @@ func (s *service) GetData(ctx context.Context) ([]models.SensorData, error) {
 	return data, nil
 }
 
-func (s *service) GetDataByDay(ctx context.Context) ([]models.SensorData, error) {
+func (s *service) GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error) {
 	data, err := s.repositories.GetDataPerDay(ctx)
 	if err != nil {
 		return nil, errors.New(err.Error())

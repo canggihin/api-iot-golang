@@ -15,7 +15,7 @@ import (
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
 	GetData(ctx context.Context) ([]models.SensorData, error)
-	GetDataPerDay(ctx context.Context) ([]models.SensorData, error)
+	GetDataPerDay(ctx context.Context) ([]models.SensorDataByDay, error)
 }
 
 type repository struct {
@@ -111,7 +111,7 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 	return resultData, nil
 }
 
-func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, error) {
+func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDay, error) {
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
 	query := `
     from(bucket: "rainfall_data")
@@ -126,7 +126,8 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
 		return nil, fmt.Errorf("error querying data: %v", err)
 	}
 
-	var resultData []models.SensorData
+	var resultData []models.SensorDataByDay
+	dataMap := make(map[string]*models.SensorDataByDay)
 	for result.Next() {
 		// Extract the average values for each field from the record
 		values := result.Record().Values()
@@ -135,6 +136,24 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, er
 
 		log.Println("data result :", values)
 		log.Println("timestamp :", formattedTime)
+		if dataMap[formattedTime] == nil {
+			dataMap[formattedTime] = &models.SensorDataByDay{FormattedTime: formattedTime} // Initialize if not already
+		}
+		data := dataMap[formattedTime]
+		switch values["_field"].(string) {
+		case "temperature":
+			if temp, ok := values["_value"].(float64); ok {
+				data.Temperature = temp
+			}
+		case "humidity":
+			if humidity, ok := values["_value"].(float64); ok {
+				data.Humidity = humidity
+			}
+		case "pressure":
+			if pressure, ok := values["_value"].(float64); ok {
+				data.Pressure = pressure
+			}
+		}
 	}
 
 	return resultData, nil
