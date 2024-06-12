@@ -56,7 +56,6 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorDataResponse, 
 	from(bucket: "rainfall_data")
 	|> range(start: -inf)
 	|> filter(fn: (r) => r._measurement == "rainfall")
-	|> keep(columns: ["_time", "temperature", "humidity", "message", "rain_was_fall", "pressure"])
 	`
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
