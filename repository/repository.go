@@ -14,7 +14,7 @@ import (
 
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
-	GetData(ctx context.Context) ([]models.SensorData, error)
+	GetData(ctx context.Context) ([]models.SensorDataResponse, error)
 }
 
 type repository struct {
@@ -45,7 +45,7 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	return nil
 }
 
-func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
+func (r *repository) GetData(ctx context.Context) ([]models.SensorDataResponse, error) {
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
 	query := `
 	from(bucket: "rainfall_data")
@@ -59,9 +59,9 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		return nil, err
 	}
 
-	var resultData []models.SensorData
+	var resultData []models.SensorDataResponse
 	for result.Next() {
-		var data models.SensorData
+		var data models.SensorDataResponse
 		record := result.Record().Value().(string)
 		log.Println("record: ", record)
 		if err := json.Unmarshal([]byte(record), &data); err != nil {
