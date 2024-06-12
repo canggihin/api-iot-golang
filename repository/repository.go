@@ -13,7 +13,7 @@ import (
 
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
-	GetData(ctx context.Context) ([]models.SensorDataResponse, error)
+	GetData(ctx context.Context) ([]models.SensorData, error)
 }
 
 type repository struct {
@@ -50,7 +50,7 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	return nil
 }
 
-func (r *repository) GetData(ctx context.Context) ([]models.SensorDataResponse, error) {
+func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
 	query := `
 	from(bucket: "rainfall_data")
@@ -62,12 +62,30 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorDataResponse, 
 		return nil, err
 	}
 
-	var resultData []models.SensorDataResponse
+	var resultData []models.SensorData
 	for result.Next() {
-		var data models.SensorDataResponse
 		values := result.Record().Values()
 		log.Println("values: ", values)
 
+		// Create a new instance of SensorDataResponse for each record
+		var data models.SensorData
+		if temp, ok := values["_value"].(float64); ok && values["_field"].(string) == "temperature" {
+			data.Temperature = temp
+		}
+		if humidity, ok := values["_value"].(float64); ok && values["_field"].(string) == "humidity" {
+			data.Humidity = humidity
+		}
+		if message, ok := values["_value"].(string); ok && values["_field"].(string) == "message" {
+			data.Message = message
+		}
+		if rainWasFall, ok := values["_value"].(float64); ok && values["_field"].(string) == "rain_was_fall" {
+			data.RainWasFall = rainWasFall
+		}
+		if pressure, ok := values["_value"].(float64); ok && values["_field"].(string) == "pressure" {
+			data.Pressure = pressure
+		}
+
+		// Append the populated struct to the result slice
 		resultData = append(resultData, data)
 	}
 	return resultData, nil
