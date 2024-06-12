@@ -55,21 +55,23 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 	from(bucket: "rainfall_data")
 	|> range(start: -inf)
 	|> filter(fn: (r) => r._measurement == "rainfall")
+	|> sort(columns: ["_time"], desc: true)
 	`
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	dataMap := make(map[time.Time]*models.SensorData)
+	dataMap := make(map[string]*models.SensorData)
 	var resultData []models.SensorData
 	for result.Next() {
 		values := result.Record().Values()
 		timestamp := result.Record().Time() // Get the timestamp of the record
-		if dataMap[timestamp] == nil {
-			dataMap[timestamp] = &models.SensorData{} // Initialize if not already
+		formattedTime := timestamp.Format("02-01-2006 15:04:05.000")
+		if dataMap[formattedTime] == nil {
+			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
 		}
-		data := dataMap[timestamp]
+		data := dataMap[formattedTime]
 
 		// Assign data based on field type
 		switch values["_field"].(string) {
