@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
@@ -62,12 +63,18 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		return nil, err
 	}
 
+	jakartaLocation, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		return nil, fmt.Errorf("error loading Jakarta location: %v", err)
+	}
+
 	dataMap := make(map[string]*models.SensorData)
 	var resultData []models.SensorData
 	for result.Next() {
 		values := result.Record().Values()
 		timestamp := result.Record().Time() // Get the timestamp of the record
-		formattedTime := timestamp.Format("02-01-2006 15:04:05.000")
+		localTime := timestamp.In(jakartaLocation)
+		formattedTime := localTime.Format("02-01-2006 15:04:05.000")
 		if dataMap[formattedTime] == nil {
 			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
 		}
