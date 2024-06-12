@@ -75,6 +75,7 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		timestamp := result.Record().Time() // Get the timestamp of the record
 		localTime := timestamp.In(jakartaLocation)
 		formattedTime := localTime.Format("02-01-2006 15:04:05.000")
+		fmt.Println("UTC Time:", timestamp.String(), "Jakarta Time:", localTime.String())
 		if dataMap[formattedTime] == nil {
 			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
 		}

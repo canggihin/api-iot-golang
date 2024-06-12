@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/service"
 	"net/http"
@@ -61,6 +62,7 @@ func (h *handlers) GetData(c *gin.Context) {
 			})
 			return
 		}
+		log.Println(err)
 		c.JSON(500, gin.H{
 			"code": http.StatusInternalServerError,
 			"msg":  "Internal Server Error",
