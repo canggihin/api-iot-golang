@@ -63,19 +63,13 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		return nil, err
 	}
 
-	jakartaLocation, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		return nil, fmt.Errorf("error loading Jakarta location: %v", err)
-	}
-
 	dataMap := make(map[string]*models.SensorData)
 	var resultData []models.SensorData
 	for result.Next() {
 		values := result.Record().Values()
-		timestamp := result.Record().Time() // Get the timestamp of the record
-		localTime := timestamp.In(jakartaLocation)
-		formattedTime := localTime.Format("02-01-2006 15:04:05.000")
-		fmt.Println("UTC Time:", timestamp.String(), "Jakarta Time:", localTime.String())
+		timestamp := result.Record().Time()
+		formattedTime := timestamp.Format("02-01-2006 15:04:05")
+		fmt.Println("UTC Time:", timestamp.String())
 		if dataMap[formattedTime] == nil {
 			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
 		}
