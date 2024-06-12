@@ -76,3 +76,28 @@ func (h *handlers) GetData(c *gin.Context) {
 		"data": data,
 	})
 }
+
+func (h *handlers) GetDataByDay(c *gin.Context) {
+	data, err := h.services.GetDataByDay(c)
+	if err != nil {
+		if err.Error() == "data not found" {
+			c.JSON(404, gin.H{
+				"code": http.StatusNotFound,
+				"msg":  "Data Not Found",
+			})
+			return
+		}
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  "Internal Server Error",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"code": http.StatusOK,
+		"msg":  "Success",
+		"data": data,
+	})
+}

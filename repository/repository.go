@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
@@ -13,6 +14,7 @@ import (
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
 	GetData(ctx context.Context) ([]models.SensorData, error)
+	GetDataPerDay(ctx context.Context) ([]models.SensorData, error)
 }
 
 type repository struct {
@@ -103,6 +105,42 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 	// Transfer from map to slice
 	for _, d := range dataMap {
 		resultData = append(resultData, *d)
+	}
+
+	return resultData, nil
+}
+
+func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorData, error) {
+	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
+	query := `
+    from(bucket: "rainfall_data")
+    |> range(start: -inf)
+    |> filter(fn: (r) => r._measurement == "rainfall")
+    |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+    |> pivot(
+        rowKey:["_time"],
+        columnKey: ["_field"],
+        valueColumn: "_value"
+    )
+    |> sort(columns: ["_time"], desc: true)
+    `
+	result, err := queryApi.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var resultData []models.SensorData
+	for result.Next() {
+		// Extract the average values for each field from the record
+		values := result.Record().Values()
+		timestamp := result.Record().Time()
+		formattedTime := timestamp.Format("02-01-2006")
+
+		// Create a new SensorData for each record
+		log.Println("data result :", values)
+		log.Println("timestamp :", formattedTime)
+		// Append the data to the result slice
+		// resultData = append(resultData, data)
 	}
 
 	return resultData, nil

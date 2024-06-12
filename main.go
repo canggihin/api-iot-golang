@@ -36,6 +36,7 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	r.POST("/data", handlers.CreateData)
 	r.GET("/ws", handlers.HandleConnectionWs)
 	r.GET("/data", handlers.GetData)
+	r.GET("/reportday", handlers.GetDataByDay)
 }
 
 func main() {
