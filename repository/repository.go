@@ -126,13 +126,15 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDa
 		return nil, fmt.Errorf("error querying data: %v", err)
 	}
 
+	gmt7Offset := time.Hour * 7
 	var resultData []models.SensorDataByDay
 	dataMap := make(map[string]*models.SensorDataByDay)
 	for result.Next() {
 		// Extract the average values for each field from the record
 		values := result.Record().Values()
 		timestamp := result.Record().Time()
-		formattedTime := timestamp.Format("01/02/2006")
+		gmt7Time := timestamp.Add(gmt7Offset)
+		formattedTime := gmt7Time.Format("01/02/2006")
 
 		log.Println("data result :", values)
 		log.Println("timestamp :", formattedTime)
