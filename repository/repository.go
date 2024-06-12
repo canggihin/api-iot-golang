@@ -29,16 +29,19 @@ func NewRepository(influxdb influxdb2.Client) *repository {
 func (r *repository) InsertData(ctx context.Context, data models.SensorData) error {
 	writeAPI := r.influxdb.WriteAPIBlocking(os.Getenv("ORG_INFLUX"), os.Getenv("BUCKET_INFLUX"))
 
+	dataJson, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
 	point := influxdb2.NewPoint(
 		"rainfall",
 		map[string]string{"sensorID": "sensor1"},
 		map[string]interface{}{
-			"data": data},
+			"data": dataJson},
 		time.Now().UTC(),
 	)
 
-	err := writeAPI.WritePoint(ctx, point)
-	if err != nil {
+	if err := writeAPI.WritePoint(ctx, point); err != nil {
 		return err
 	}
 	pkg.Broadcast <- []byte("data berhasil diinputkan ke influxdb")
