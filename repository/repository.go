@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
@@ -71,7 +70,6 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 		timestamp := result.Record().Time()
 		gmt7Time := timestamp.Add(gmt7Offset)
 		formattedTime := gmt7Time.Format("02-01-2006 15:04:05")
-		fmt.Println("UTC Time:", timestamp.String())
 		if dataMap[formattedTime] == nil {
 			dataMap[formattedTime] = &models.SensorData{FormattedTime: formattedTime} // Initialize if not already
 		}
