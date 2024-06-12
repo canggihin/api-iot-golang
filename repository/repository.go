@@ -132,7 +132,7 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDa
 		// Extract the average values for each field from the record
 		values := result.Record().Values()
 		timestamp := result.Record().Time()
-		formattedTime := timestamp.Format("02-01-2006")
+		formattedTime := timestamp.Format("02/01/2006")
 
 		log.Println("data result :", values)
 		log.Println("timestamp :", formattedTime)
