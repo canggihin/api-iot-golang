@@ -9,6 +9,7 @@ import (
 
 type Service interface {
 	InsertData(ctx context.Context, data models.SensorData) error
+	GetData(ctx context.Context) ([]models.SensorData, error)
 }
 
 type service struct {
@@ -27,4 +28,12 @@ func (s *service) InsertData(ctx context.Context, data models.SensorData) error 
 		return errors.New("failed to insert data")
 	}
 	return nil
+}
+
+func (s *service) GetData(ctx context.Context) ([]models.SensorData, error) {
+	data, err := s.repositories.GetData(ctx)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+	return data, nil
 }

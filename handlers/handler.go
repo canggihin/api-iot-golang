@@ -50,3 +50,28 @@ func (h *handlers) CreateData(c *gin.Context) {
 		})
 	}
 }
+
+func (h *handlers) GetData(c *gin.Context) {
+	data, err := h.services.GetData(c)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  "Internal Server Error",
+		})
+		return
+	}
+
+	if data == nil {
+		c.JSON(404, gin.H{
+			"code": http.StatusNotFound,
+			"msg":  "Data Not Found",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"code": http.StatusOK,
+		"msg":  "Success",
+		"data": data,
+	})
+}
