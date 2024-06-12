@@ -13,6 +13,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func handleMessages() {
+	for {
+		msg := <-pkg.Broadcast
+		for client := range pkg.Clients {
+			err := client.WriteMessage(1, msg)
+			if err != nil {
+				fmt.Println(err)
+				client.Close()
+				delete(pkg.Clients, client)
+			}
+		}
+	}
+}
+
 func router(r *gin.Engine, influxdb influxdb2.Client) {
 
 	repo := repository.NewRepository(influxdb)
@@ -20,6 +34,8 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	handlers := handlers.NewHandler(service)
 
 	r.POST("/data", handlers.CreateData)
+	r.GET("/ws", handlers.HandleConnectionWs)
+	r.GET("/data", handlers.GetData)
 }
 
 func main() {
@@ -39,6 +55,7 @@ func main() {
 	r.Use(cors.New(configCors))
 	router(r, influxdb)
 
+	go handleMessages()
 	r.Run(":8089")
 	fmt.Println("HTTP server is running on http://localhost:8089")
 }

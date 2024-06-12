@@ -2,7 +2,10 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
+	"log"
 	"mqtt-golang-rainfall-prediction/models"
+	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
 	"time"
 
@@ -11,6 +14,7 @@ import (
 
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
+	GetData(ctx context.Context) ([]models.SensorData, error)
 }
 
 type repository struct {
@@ -29,11 +33,7 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 		"rainfall",
 		map[string]string{"sensorID": "sensor1"},
 		map[string]interface{}{
-			"temperature": data.Temperature,
-			"humidity":    data.Humidity,
-			"pressure":    data.Pressure,
-			"rainWasFall": data.RainWasFall,
-		},
+			"data": data},
 		time.Now().UTC(),
 	)
 
@@ -41,5 +41,34 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	if err != nil {
 		return err
 	}
+	pkg.Broadcast <- []byte("data berhasil diinputkan ke influxdb")
 	return nil
+}
+
+func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
+	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
+	query := `
+	from(bucket: "rainfall_data")
+	|> range(start: -inf)
+	|> filter(fn: (r) => r._measurement == "rainfall")
+	|> filter(fn: (r) => r._field == "data")
+	|> keep(columns: ["_value"])
+	`
+	result, err := queryApi.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	var resultData []models.SensorData
+	for result.Next() {
+		var data models.SensorData
+		record := result.Record().Value().(string)
+		log.Println("record: ", record)
+		if err := json.Unmarshal([]byte(record), &data); err != nil {
+			log.Println("Error unmarshal data: ", err)
+			continue
+		}
+		resultData = append(resultData, data)
+	}
+	return resultData, nil
 }
