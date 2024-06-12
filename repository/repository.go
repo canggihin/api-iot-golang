@@ -118,7 +118,7 @@ func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDa
 		|> range(start: -inf)
 		|> filter(fn: (r) => r["_measurement"] == "rainfall")
 		|> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pressure" or r["_field"] == "temperature")
-		|> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+		|> aggregateWindow(every: 12h, fn: mean, createEmpty: false)
 		|> yield(name: "mean")
     `
 	result, err := queryApi.Query(ctx, query)
