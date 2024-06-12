@@ -70,8 +70,8 @@ func (s *service) GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, e
 	// Sort data by FormattedTime, parsing the time to ensure correct ordering
 	sort.Slice(data, func(i, j int) bool {
 		// Parse the times
-		t1, err1 := time.Parse("02/01/2006", data[i].FormattedTime)
-		t2, err2 := time.Parse("02/01/2006", data[j].FormattedTime)
+		t1, err1 := time.Parse("01/02/2006", data[i].FormattedTime)
+		t2, err2 := time.Parse("01/02/2006", data[j].FormattedTime)
 		if err1 != nil || err2 != nil {
 			return false // Handle parse error, maybe log or handle differently
 		}
