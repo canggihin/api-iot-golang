@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"mqtt-golang-rainfall-prediction/models"
+	"mqtt-golang-rainfall-prediction/pkg"
 	"mqtt-golang-rainfall-prediction/service"
 	"net/http"
 
@@ -99,5 +100,13 @@ func (h *handlers) GetDataByDay(c *gin.Context) {
 		"code": http.StatusOK,
 		"msg":  "Success",
 		"data": data,
+	})
+}
+
+func (h *handlers) SuccessConnectedDevice(c *gin.Context) {
+	pkg.Broadcast <- []byte("Device Connected")
+	c.JSON(200, gin.H{
+		"code": http.StatusOK,
+		"msg":  "Success",
 	})
 }
