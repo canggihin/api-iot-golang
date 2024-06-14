@@ -19,7 +19,13 @@ func handleMessages(client *pkg.Client) {
 			break
 		}
 		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
-		client.Timer.Reset(10 * time.Second)
+
+		// Ensure timer is actively managed and reset here.
+		if client.Timer != nil {
+			client.Timer.Reset(10 * time.Second)
+		} else {
+			fmt.Println("Timer is nil, can't reset")
+		}
 	}
 }
 
@@ -39,6 +45,21 @@ func handleCWs(c *gin.Context, clientType string) {
 	}
 
 	client := &pkg.Client{Conn: conn, Type: clientType}
+	setupTimer(client)
+
+	pkg.AddClient(client)
+	defer pkg.RemoveClient(client)
+	defer client.Conn.Close()
+	defer func() {
+		if client.Timer != nil {
+			client.Timer.Stop()
+		}
+	}()
+
+	handleMessages(client)
+}
+
+func setupTimer(client *pkg.Client) {
 	client.Timer = time.AfterFunc(10*time.Second, func() {
 		var data models.SystemInfo
 		data.Status = 0
@@ -48,19 +69,12 @@ func handleCWs(c *gin.Context, clientType string) {
 		data.DHTSensor = 0
 		data.BMP180Sensor = 0
 		data.RainSensor = 0
-		jasonData, err := json.Marshal(data)
+		jsonData, err := json.Marshal(data)
 		if err != nil {
-			fmt.Println("Error marshal data: ", err)
+			fmt.Println("Error marshalling data: ", err)
 			return
 		}
 		fmt.Println("WebSocket inactive for 10 seconds, sending status 0")
-		client.Conn.WriteMessage(websocket.TextMessage, jasonData)
+		client.Conn.WriteMessage(websocket.TextMessage, jsonData)
 	})
-
-	pkg.AddClient(client)
-	defer pkg.RemoveClient(client)
-	defer client.Conn.Close()
-	defer client.Timer.Stop()
-
-	handleMessages(client)
 }
