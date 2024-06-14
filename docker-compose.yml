@@ -7,6 +7,8 @@ services:
       - BUCKET_INFLUX=${BUCKET_INFLUX}
       - URL_INFLUX=${URL_INFLUX}
       - TOKEN_INFLUX=${TOKEN_INFLUX}
+      - MQTT_BROKER=${MQTT_BROKER}
+      - MQTT_PORT=${MQTT_PORT}
     networks:
       - db-network
       - service-networks

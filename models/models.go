@@ -16,3 +16,12 @@ type SensorDataByDay struct {
 	Pressure      float64 `json:"pressure"`
 	FormattedTime string  `json:"formattedTime"`
 }
+
+type SystemInfo struct {
+	TotalSensor  int    `json:"total_sensor"`
+	RamConsume   string `json:"ram_consume"`
+	CpuConsume   string `json:"cpu_consume"`
+	DHTSensor    int    `json:"dht_sensor"`
+	BMP180Sensor int    `json:"bmp180_sensor"`
+	RainSensor   int    `json:"rain_sensor"`
+}

@@ -13,6 +13,7 @@ type Service interface {
 	InsertData(ctx context.Context, data models.SensorData) error
 	GetData(ctx context.Context) ([]models.SensorData, error)
 	GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error)
+	ProsesMessage(ctx context.Context, data models.SystemInfo) (models.SystemInfo, error)
 }
 
 type service struct {
