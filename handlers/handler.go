@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
@@ -29,6 +30,14 @@ func (h *handlers) CreateData(c *gin.Context) {
 			c.JSON(400, gin.H{
 				"code": http.StatusBadRequest,
 				"msg":  "Bad Request",
+			})
+			return
+		}
+
+		if dataAntares.Temperature == 0 || dataAntares.Humidity == 0 || dataAntares.Pressure == 0 {
+			c.JSON(400, gin.H{
+				"code": http.StatusBadRequest,
+				"msg":  fmt.Sprintf("Invalid sensor data: %+v", dataAntares),
 			})
 			return
 		}

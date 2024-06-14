@@ -48,7 +48,7 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	if err != nil {
 		return err
 	}
-	pkg.Broadcast <- []byte(`{"status": 1, "message": "Data inserted"}`)
+	pkg.BroadcastToSensors([]byte(`{"status": 1, "message": "Data inserted"}`))
 	return nil
 }
 
