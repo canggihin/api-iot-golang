@@ -9,13 +9,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func handleMessages(client *pkg.Client, clientType string) {
-	_, msg, err := client.Conn.ReadMessage()
-	if err != nil {
-		fmt.Printf("%s Data read error: %v\n", clientType, err)
-		return
+func handleMessages(client *pkg.Client) {
+	for {
+		_, msg, err := client.Conn.ReadMessage()
+		if err != nil {
+			fmt.Printf("%s Data read error: %v\n", client.Type, err)
+			break
+		}
+		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
+		// Proses pesan lebih lanjut di sini, misalnya dengan broadcasting atau logging
 	}
-	fmt.Printf("Received %s Data: %s\n", clientType, string(msg))
 }
 
 func (h *handlers) HandleWsSensor(c *gin.Context) {
