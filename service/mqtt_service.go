@@ -31,6 +31,7 @@ func (s *service) ProsesMessage(ctx context.Context, data models.SystemInfo) (mo
 		return models.SystemInfo{}, nil
 	}
 
+	log.Println("Data Will see on FE: ", data)
 	pkg.BroadcastToSystems([]byte(`{"status": 1, "message": "Data accepted"}`))
 	return data, nil
 }
