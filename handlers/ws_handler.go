@@ -62,8 +62,5 @@ func handleCWs(c *gin.Context, clientType string) {
 	defer client.Conn.Close()
 	defer client.Timer.Stop()
 
-	for {
-		client.Timer.Reset(10 * time.Second)
-		handleMessages(client)
-	}
+	handleMessages(client)
 }
