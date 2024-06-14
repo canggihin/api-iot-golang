@@ -46,7 +46,7 @@ func handleCWs(c *gin.Context, clientType string) {
 
 	client := &pkg.Client{Conn: conn, Type: clientType}
 
-	go setupTimer(client)
+	setupTimer(client)
 
 	handleMessages(client)
 
