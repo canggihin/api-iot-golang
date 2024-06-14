@@ -17,7 +17,7 @@ func handleMessages(client *pkg.Client) {
 			break
 		}
 		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
-		// Proses pesan lebih lanjut di sini, misalnya dengan broadcasting atau logging
+		client.Timer.Reset(10 * time.Second)
 	}
 }
 
