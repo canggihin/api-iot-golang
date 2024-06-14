@@ -25,6 +25,6 @@ COPY --from=builder /app/main .
 # Copy CA certificates from the certs stage
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-EXPOSE 8080
+EXPOSE 8089
 
 CMD ["./main"]
