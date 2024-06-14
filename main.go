@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mqtt-golang-rainfall-prediction/handlers"
 	"mqtt-golang-rainfall-prediction/pkg"
+	mqtt_pkg "mqtt-golang-rainfall-prediction/pkg/mqtt"
 	"mqtt-golang-rainfall-prediction/repository"
 	"mqtt-golang-rainfall-prediction/service"
 
@@ -25,6 +26,7 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	r.GET("/data", handlers.GetData)
 	r.GET("/reportday", handlers.GetDataByDay)
 	r.POST("/connect", handlers.SuccessConnectedDevice)
+	r.POST("/sysinfo", handlers.GetSystemInfo)
 }
 
 func main() {
@@ -36,6 +38,8 @@ func main() {
 		return
 	}
 
+	clientMqtt := mqtt_pkg.ConnectMqtt(influxdb)
+	mqtt_pkg.SubscribeMqtt(clientMqtt, "sensor", influxdb)
 	configCors := cors.DefaultConfig()
 	configCors.AllowAllOrigins = true
 

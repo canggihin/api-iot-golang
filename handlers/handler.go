@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -117,5 +118,40 @@ func (h *handlers) SuccessConnectedDevice(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"code": http.StatusOK,
 		"msg":  "Success",
+	})
+}
+
+func (h *handlers) GetSystemInfo(c *gin.Context) {
+	var dataReq models.SystemInfo
+	if err := c.ShouldBindJSON(&dataReq); err != nil {
+		c.JSON(400, gin.H{
+			"code": http.StatusBadRequest,
+			"msg":  "Bad Request",
+		})
+		return
+
+	}
+
+	data, err := h.services.ProsesMessage(context.Background(), dataReq)
+	if err != nil {
+		if err.Error() == "data not found" {
+			c.JSON(404, gin.H{
+				"code": http.StatusNotFound,
+				"msg":  "Data Not Found",
+			})
+			return
+		}
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  "Internal Server Error",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"code": http.StatusOK,
+		"msg":  "Success",
+		"data": data,
 	})
 }
