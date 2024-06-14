@@ -24,4 +24,5 @@ type SystemInfo struct {
 	DHTSensor    int    `json:"dht_sensor"`
 	BMP180Sensor int    `json:"bmp180_sensor"`
 	RainSensor   int    `json:"rain_sensor"`
+	Status       int    `json:"status"`
 }
