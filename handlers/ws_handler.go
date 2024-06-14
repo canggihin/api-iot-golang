@@ -49,6 +49,6 @@ func handleCWs(c *gin.Context, clientType string) {
 
 	for {
 		client.Timer.Reset(10 * time.Second)
-		handleMessages(client, clientType)
+		handleMessages(client)
 	}
 }
