@@ -41,6 +41,13 @@ func handleCWs(c *gin.Context, clientType string) {
 	client := &pkg.Client{Conn: conn, Type: clientType}
 	client.Timer = time.AfterFunc(10*time.Second, func() {
 		var data models.SystemInfo
+		data.Status = 0
+		data.TotalSensor = 0
+		data.RamConsume = ""
+		data.CpuConsume = ""
+		data.DHTSensor = 0
+		data.BMP180Sensor = 0
+		data.RainSensor = 0
 		jasonData, err := json.Marshal(data)
 		if err != nil {
 			fmt.Println("Error marshal data: ", err)
