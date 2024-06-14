@@ -21,6 +21,8 @@ func ConnectMqtt(influxdb influxdb2.Client) mqtt.Client {
 
 	repo := repository.NewRepository(influxdb)
 	service := service.NewService(repo)
+	opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
 	opts.SetDefaultPublishHandler(service.MessageMqttHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
