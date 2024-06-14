@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"mqtt-golang-rainfall-prediction/models"
 	"mqtt-golang-rainfall-prediction/pkg"
 	"time"
 
@@ -38,8 +40,14 @@ func handleCWs(c *gin.Context, clientType string) {
 
 	client := &pkg.Client{Conn: conn, Type: clientType}
 	client.Timer = time.AfterFunc(10*time.Second, func() {
+		var data models.SystemInfo
+		jasonData, err := json.Marshal(data)
+		if err != nil {
+			fmt.Println("Error marshal data: ", err)
+			return
+		}
 		fmt.Println("WebSocket inactive for 10 seconds, sending status 0")
-		client.Conn.WriteMessage(websocket.TextMessage, []byte(`{"status": 0}`))
+		client.Conn.WriteMessage(websocket.TextMessage, jasonData)
 	})
 
 	pkg.AddClient(client)
