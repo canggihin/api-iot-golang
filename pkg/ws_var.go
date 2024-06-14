@@ -16,24 +16,54 @@ var (
 			return true
 		},
 	}
-	Clients   = make(map[*websocket.Conn]bool)
-	Broadcast = make(chan []byte)
-	mutex     = &sync.Mutex{}
+	Clients       = make(map[*websocket.Conn]bool)
+	SensorClients = make(map[*Client]bool)
+	SystemClients = make(map[*Client]bool)
+	Broadcast     = make(chan []byte)
+	mutex         = &sync.Mutex{}
 )
 
 type Client struct {
 	Conn  *websocket.Conn
 	Timer *time.Timer
+	Type  string
 }
 
-func AddClient(conn *websocket.Conn) {
+func AddClient(client *Client) {
 	mutex.Lock()
-	Clients[conn] = true
-	mutex.Unlock()
+	defer mutex.Unlock()
+	Clients[client.Conn] = true
+	if client.Type == "sensor" {
+		SensorClients[client] = true
+	} else if client.Type == "system" {
+		SystemClients[client] = true
+	}
 }
 
-func RemoveClient(conn *websocket.Conn) {
+func RemoveClient(client *Client) {
 	mutex.Lock()
-	delete(Clients, conn)
-	mutex.Unlock()
+	defer mutex.Unlock()
+	delete(Clients, client.Conn)
+	if client.Type == "sensor" {
+		delete(SensorClients, client)
+	} else if client.Type == "system" {
+		delete(SystemClients, client)
+	}
+	client.Conn.Close()
+}
+
+func BroadcastToSensors(message []byte) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	for client := range SensorClients {
+		client.Conn.WriteMessage(websocket.TextMessage, message)
+	}
+}
+
+func BroadcastToSystems(message []byte) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	for client := range SystemClients {
+		client.Conn.WriteMessage(websocket.TextMessage, message)
+	}
 }
