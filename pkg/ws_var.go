@@ -3,6 +3,7 @@ package pkg
 import (
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -19,6 +20,11 @@ var (
 	Broadcast = make(chan []byte)
 	mutex     = &sync.Mutex{}
 )
+
+type Client struct {
+	Conn  *websocket.Conn
+	Timer *time.Timer
+}
 
 func AddClient(conn *websocket.Conn) {
 	mutex.Lock()
