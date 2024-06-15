@@ -28,15 +28,15 @@ func handleMessages(client *pkg.Client) {
 
 		// Reset the timer on message receipt
 		if client.Timer != nil {
-			client.Timer.Reset(10 * time.Second)
+			client.Timer.Reset(30 * time.Second)
 		}
 	}
 }
 
 func setupTimer(client *pkg.Client) {
-	client.Timer = time.AfterFunc(10*time.Second, func() {
+	client.Timer = time.AfterFunc(30*time.Second, func() {
 		sendStatus(client)
-		client.Timer.Reset(10 * time.Second) // Immediately reset the timer
+		client.Timer.Reset(30 * time.Second) // Immediately reset the timer
 	})
 }
 
