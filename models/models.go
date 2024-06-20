@@ -18,11 +18,11 @@ type SensorDataByDay struct {
 }
 
 type SystemInfo struct {
-	TotalSensor  int    `json:"total_sensor"`
-	RamConsume   string `json:"ram_consume"`
-	CpuConsume   string `json:"cpu_consume"`
-	DHTSensor    int    `json:"dht_sensor"`
-	BMP180Sensor int    `json:"bmp180_sensor"`
-	RainSensor   int    `json:"rain_sensor"`
-	BatteryLevel int    `json:"battery_level"`
+	TotalSensor  int     `json:"total_sensor"`
+	RamConsume   string  `json:"ram_consume"`
+	CpuConsume   string  `json:"cpu_consume"`
+	DHTSensor    int     `json:"dht_sensor"`
+	BMP180Sensor int     `json:"bmp180_sensor"`
+	RainSensor   int     `json:"rain_sensor"`
+	BatteryLevel float64 `json:"battery_level"`
 }
