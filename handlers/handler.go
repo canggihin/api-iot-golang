@@ -114,7 +114,7 @@ func (h *handlers) GetDataByDay(c *gin.Context) {
 }
 
 func (h *handlers) SuccessConnectedDevice(c *gin.Context) {
-	pkg.Broadcast <- []byte("Device Connected")
+	pkg.BroadcastToSystems([]byte("Connected Device"))
 	c.JSON(200, gin.H{
 		"code": http.StatusOK,
 		"msg":  "Success",
