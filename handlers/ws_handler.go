@@ -42,7 +42,7 @@ func setupTimer(client *pkg.Client) {
 
 func sendStatus(client *pkg.Client) {
 	var data models.SystemInfo
-	data.Status = 0
+	data.BatteryLevel = 0
 	data.TotalSensor = 0
 	data.RamConsume = ""
 	data.CpuConsume = ""
