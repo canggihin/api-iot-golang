@@ -114,7 +114,8 @@ func (h *handlers) GetDataByDay(c *gin.Context) {
 }
 
 func (h *handlers) SuccessConnectedDevice(c *gin.Context) {
-	pkg.BroadcastToSystems([]byte("Connected Device"))
+	battery := c.Query("battery")
+	pkg.BroadcastToSystems([]byte(fmt.Sprintf(`{"battery_level": %s}`, battery)))
 	c.JSON(200, gin.H{
 		"code": http.StatusOK,
 		"msg":  "Success",
