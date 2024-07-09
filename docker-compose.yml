@@ -11,6 +11,7 @@ services:
       - MQTT_PORT=${MQTT_PORT}
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - PUBLIC_KEY_PASSETO=${PUBLIC_KEY_PASSETO}
     networks:
       - db-network
       - service-networks
