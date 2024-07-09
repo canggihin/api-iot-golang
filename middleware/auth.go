@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 
 	"aidanwoods.dev/go-paseto"
@@ -18,6 +19,7 @@ func AuthMiddleware(roleParams ...string) gin.HandlerFunc {
 		}
 
 		pubKeyHex := os.Getenv("PUBLIC_KEY_PASSETO")
+		log.Println(pubKeyHex)
 		if pubKeyHex == "" {
 			c.JSON(500, gin.H{"message": "Public key not set in environment"})
 			c.Abort()
