@@ -11,8 +11,8 @@ import (
 
 type Service interface {
 	InsertData(ctx context.Context, data models.SensorData) error
-	GetData(ctx context.Context) ([]models.SensorData, error)
-	GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error)
+	GetData(ctx context.Context, username string) ([]models.SensorData, error)
+	GetDataByDay(ctx context.Context, username string) ([]models.SensorDataByDay, error)
 	ProsesMessage(ctx context.Context, data models.SystemInfo) (models.SystemInfo, error)
 }
 
@@ -34,8 +34,8 @@ func (s *service) InsertData(ctx context.Context, data models.SensorData) error 
 	return nil
 }
 
-func (s *service) GetData(ctx context.Context) ([]models.SensorData, error) {
-	data, err := s.repositories.GetData(ctx)
+func (s *service) GetData(ctx context.Context, username string) ([]models.SensorData, error) {
+	data, err := s.repositories.GetData(ctx, username)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
@@ -58,8 +58,8 @@ func (s *service) GetData(ctx context.Context) ([]models.SensorData, error) {
 	return data, nil
 }
 
-func (s *service) GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error) {
-	data, err := s.repositories.GetDataPerDay(ctx)
+func (s *service) GetDataByDay(ctx context.Context, username string) ([]models.SensorDataByDay, error) {
+	data, err := s.repositories.GetDataPerDay(ctx, username)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}

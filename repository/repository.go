@@ -14,8 +14,8 @@ import (
 
 type RepositoryInterface interface {
 	InsertData(ctx context.Context, data models.SensorData) error
-	GetData(ctx context.Context) ([]models.SensorData, error)
-	GetDataPerDay(ctx context.Context) ([]models.SensorDataByDay, error)
+	GetData(ctx context.Context, username string) ([]models.SensorData, error)
+	GetDataPerDay(ctx context.Context, username string) ([]models.SensorDataByDay, error)
 }
 
 type repository struct {
@@ -52,14 +52,15 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	return nil
 }
 
-func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
+func (r *repository) GetData(ctx context.Context, username string) ([]models.SensorData, error) {
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
-	query := `
+	query := fmt.Sprintf(`
 	from(bucket: "rainfall_data")
 	|> range(start: -inf)
-	|> filter(fn: (r) => r._measurement == "rainfall")
+	|> filter(fn: (r) => r["username"] == %s)
 	|> sort(columns: ["_time"], desc: true)
-	`
+	`, username,
+	)
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
 		return nil, err
@@ -111,16 +112,16 @@ func (r *repository) GetData(ctx context.Context) ([]models.SensorData, error) {
 	return resultData, nil
 }
 
-func (r *repository) GetDataPerDay(ctx context.Context) ([]models.SensorDataByDay, error) {
+func (r *repository) GetDataPerDay(ctx context.Context, username string) ([]models.SensorDataByDay, error) {
 	queryApi := r.influxdb.QueryAPI(os.Getenv("ORG_INFLUX"))
-	query := `
+	query := fmt.Sprintf(`
     from(bucket: "rainfall_data")
 		|> range(start: -inf)
-		|> filter(fn: (r) => r["_measurement"] == "rainfall")
+		|> filter(fn: (r) => r["username"] == %s)
 		|> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pressure" or r["_field"] == "temperature")
 		|> aggregateWindow(every: 12h, fn: mean, createEmpty: false)
 		|> yield(name: "mean")
-    `
+    `, username)
 	result, err := queryApi.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("error querying data: %v", err)

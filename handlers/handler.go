@@ -65,7 +65,8 @@ func (h *handlers) CreateData(c *gin.Context) {
 }
 
 func (h *handlers) GetData(c *gin.Context) {
-	data, err := h.services.GetData(c)
+	username := c.Query("username")
+	data, err := h.services.GetData(c, username)
 	if err != nil {
 		if err.Error() == "data not found" {
 			c.JSON(404, gin.H{
@@ -90,7 +91,9 @@ func (h *handlers) GetData(c *gin.Context) {
 }
 
 func (h *handlers) GetDataByDay(c *gin.Context) {
-	data, err := h.services.GetDataByDay(c)
+	username := c.Query("username")
+
+	data, err := h.services.GetDataByDay(c, username)
 	if err != nil {
 		if err.Error() == "data not found" {
 			c.JSON(404, gin.H{
