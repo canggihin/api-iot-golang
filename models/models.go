@@ -1,6 +1,7 @@
 package models
 
 type SensorData struct {
+	Username      string  `json:"username"`
 	Temperature   float64 `json:"temperature"`
 	Humidity      float64 `json:"humidity"`
 	Message       string  `json:"message"`

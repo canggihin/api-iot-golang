@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"mqtt-golang-rainfall-prediction/handlers"
+	"mqtt-golang-rainfall-prediction/middleware"
 	"mqtt-golang-rainfall-prediction/pkg"
 	mqtt_pkg "mqtt-golang-rainfall-prediction/pkg/mqtt"
 	"mqtt-golang-rainfall-prediction/repository"
@@ -20,7 +21,7 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	service := service.NewService(repo)
 	handlers := handlers.NewHandler(service)
 
-	r.POST("/data", handlers.CreateData)
+	r.POST("/data/:username", middleware.AuthMiddleware("user"), handlers.CreateData)
 	r.GET("/ws/sensor", handlers.HandleWsSensor)
 	r.GET("/ws/system", handlers.HandleWsSystem)
 	r.GET("/data", handlers.GetData)

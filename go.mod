@@ -11,6 +11,8 @@ require (
 )
 
 require (
+	aidanwoods.dev/go-paseto v1.5.1 // indirect
+	aidanwoods.dev/go-result v0.1.0 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
