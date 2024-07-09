@@ -24,6 +24,7 @@ func NewHandler(services service.Service) *handlers {
 }
 
 func (h *handlers) CreateData(c *gin.Context) {
+	username := c.Param("username")
 	if c.Request.Body != nil || c.Request.ContentLength > 0 {
 		var dataAntares models.SensorData
 		decoder := json.NewDecoder(c.Request.Body)
@@ -34,7 +35,6 @@ func (h *handlers) CreateData(c *gin.Context) {
 			})
 			return
 		}
-
 		if dataAntares.Temperature == 0 || dataAntares.Humidity == 0 || dataAntares.Pressure == 0 {
 			c.JSON(400, gin.H{
 				"code": http.StatusBadRequest,
@@ -42,6 +42,7 @@ func (h *handlers) CreateData(c *gin.Context) {
 			})
 			return
 		}
+		dataAntares.Username = username
 		err := h.services.InsertData(c, dataAntares)
 		if err != nil {
 			c.JSON(500, gin.H{

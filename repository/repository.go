@@ -33,7 +33,7 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 
 	point := influxdb2.NewPoint(
 		"rainfall",
-		map[string]string{"sensorID": "sensor1"},
+		map[string]string{"sensorID": "sensor1", "username": data.Username},
 		map[string]interface{}{
 			"temperature":   data.Temperature,
 			"humidity":      data.Humidity,
