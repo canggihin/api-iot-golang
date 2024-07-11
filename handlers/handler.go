@@ -66,6 +66,7 @@ func (h *handlers) CreateData(c *gin.Context) {
 
 func (h *handlers) GetData(c *gin.Context) {
 	username := c.Query("username")
+	log.Println(username)
 	data, err := h.services.GetData(c, username)
 	if err != nil {
 		if err.Error() == "data not found" {
