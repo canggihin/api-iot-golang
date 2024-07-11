@@ -57,7 +57,7 @@ func (r *repository) GetData(ctx context.Context, username string) ([]models.Sen
 	query := fmt.Sprintf(`
 	from(bucket: "rainfall_data")
 	|> range(start: -inf)
-	|> filter(fn: (r) => r["username"] == %s)
+	|> filter(fn: (r) => r["username"] == "%s")
 	|> sort(columns: ["_time"], desc: true)
 	`, username,
 	)
@@ -117,7 +117,7 @@ func (r *repository) GetDataPerDay(ctx context.Context, username string) ([]mode
 	query := fmt.Sprintf(`
     from(bucket: "rainfall_data")
 		|> range(start: -inf)
-		|> filter(fn: (r) => r["username"] == %s)
+		|> filter(fn: (r) => r["username"] == "%s")
 		|> filter(fn: (r) => r["_field"] == "humidity" or r["_field"] == "pressure" or r["_field"] == "temperature")
 		|> aggregateWindow(every: 12h, fn: mean, createEmpty: false)
 		|> yield(name: "mean")
