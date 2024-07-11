@@ -49,7 +49,7 @@ pipeline {
         stage('Deploy to portainer') {
             steps {
                 script {
-                sh "curl -k -X POST https://193.203.167.97:9443/api/stacks/webhooks/162ce309-938b-441c-a044-450dad4460e3"
+                sh "curl -k -X POST https://193.203.167.97:9443/api/stacks/webhooks/1e2b2a10-b47f-4058-ba65-812f76af562c"
                 echo "Deployed to Portainer"
                 }
             }
