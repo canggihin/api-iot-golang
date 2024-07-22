@@ -24,7 +24,7 @@ func NewHandler(services service.Service) *handlers {
 }
 
 func (h *handlers) CreateData(c *gin.Context) {
-	username := c.Param("username")
+	username := c.Query("username")
 	if c.Request.Body != nil || c.Request.ContentLength > 0 {
 		var dataAntares models.SensorData
 		decoder := json.NewDecoder(c.Request.Body)
