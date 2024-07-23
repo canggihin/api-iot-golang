@@ -16,17 +16,19 @@ var (
 			return true
 		},
 	}
-	Clients       = make(map[*websocket.Conn]bool)
-	SensorClients = make(map[*Client]bool)
-	SystemClients = make(map[*Client]bool)
-	Broadcast     = make(chan []byte)
-	mutex         = &sync.Mutex{}
+	Clients           = make(map[*websocket.Conn]bool)
+	SensorClients     = make(map[*Client]bool)
+	SystemClients     = make(map[*Client]bool)
+	ClientsByUsername = make(map[string]map[*Client]bool)
+	Broadcast         = make(chan []byte)
+	mutex             = &sync.Mutex{}
 )
 
 type Client struct {
-	Conn  *websocket.Conn
-	Timer *time.Timer
-	Type  string
+	Conn     *websocket.Conn
+	Timer    *time.Timer
+	Type     string
+	Username string
 }
 
 func AddClient(client *Client) {
@@ -38,6 +40,11 @@ func AddClient(client *Client) {
 	} else if client.Type == "system" {
 		SystemClients[client] = true
 	}
+
+	if _, ok := ClientsByUsername[client.Username]; !ok {
+		ClientsByUsername[client.Username] = make(map[*Client]bool)
+	}
+	ClientsByUsername[client.Username][client] = true
 }
 
 func RemoveClient(client *Client) {
@@ -48,6 +55,13 @@ func RemoveClient(client *Client) {
 		delete(SensorClients, client)
 	} else if client.Type == "system" {
 		delete(SystemClients, client)
+	}
+
+	if clients, ok := ClientsByUsername[client.Username]; ok {
+		delete(clients, client)
+		if len(clients) == 0 {
+			delete(ClientsByUsername, client.Username)
+		}
 	}
 	client.Conn.Close()
 }
@@ -65,5 +79,15 @@ func BroadcastToSystems(message []byte) {
 	defer mutex.Unlock()
 	for client := range SystemClients {
 		client.Conn.WriteMessage(websocket.TextMessage, message)
+	}
+}
+
+func BroadcastToUsername(username string, message []byte) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	if clients, ok := ClientsByUsername[username]; ok {
+		for client := range clients {
+			client.Conn.WriteMessage(websocket.TextMessage, message)
+		}
 	}
 }

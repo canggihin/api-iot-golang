@@ -65,7 +65,8 @@ func handleCWs(c *gin.Context, clientType string) {
 		return
 	}
 
-	client := &pkg.Client{Conn: conn, Type: clientType}
+	username := c.Param("username")
+	client := &pkg.Client{Conn: conn, Type: clientType, Username: username}
 	setupTimer(client)
 
 	pkg.AddClient(client)

@@ -51,6 +51,7 @@ func (h *handlers) CreateData(c *gin.Context) {
 			})
 			return
 		}
+		pkg.BroadcastToUsername(username, []byte(`{"status": 1, "message": "Data inserted"}`))
 		c.JSON(200, gin.H{
 			"code": http.StatusOK,
 			"msg":  "Success",

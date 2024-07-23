@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"mqtt-golang-rainfall-prediction/models"
-	"mqtt-golang-rainfall-prediction/pkg"
 	"os"
 	"time"
 
@@ -48,7 +47,6 @@ func (r *repository) InsertData(ctx context.Context, data models.SensorData) err
 	if err != nil {
 		return err
 	}
-	pkg.BroadcastToSensors([]byte(`{"status": 1, "message": "Data inserted"}`))
 	return nil
 }
 
