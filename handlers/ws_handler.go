@@ -11,13 +11,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// handleMessages function to handle incoming WebSocket messages
 func handleMessages(client *pkg.Client) {
-	defer func() {
-		if client.Timer != nil {
-			client.Timer.Stop()
-		}
-	}()
-
 	for {
 		_, msg, err := client.Conn.ReadMessage()
 		if err != nil {
@@ -27,19 +22,18 @@ func handleMessages(client *pkg.Client) {
 		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
 
 		// Reset the timer on message receipt
-		if client.Timer != nil {
-			client.Timer.Reset(60 * time.Second)
-		}
+		client.Timer.Reset(60 * time.Second)
 	}
 }
 
+// setupTimer function to set up a timer for the client
 func setupTimer(client *pkg.Client) {
 	client.Timer = time.AfterFunc(60*time.Second, func() {
 		sendStatus(client)
-		client.Timer.Reset(60 * time.Second) // Immediately reset the timer
 	})
 }
 
+// sendStatus function to send a status update if no message is received within the timeout period
 func sendStatus(client *pkg.Client) {
 	var data models.SystemInfo
 	data.BatteryLevel = 0
@@ -54,10 +48,14 @@ func sendStatus(client *pkg.Client) {
 		fmt.Println("Error marshalling data: ", err)
 		return
 	}
-	fmt.Println("WebSocket inactive for 10 seconds, sending status 0")
+	fmt.Println("WebSocket inactive for 60 seconds, sending status 0")
 	client.Conn.WriteMessage(websocket.TextMessage, jsonData)
+
+	// Reset the timer to check for inactivity again after sending the status
+	client.Timer.Reset(60 * time.Second)
 }
 
+// handleCWs function to handle WebSocket connections
 func handleCWs(c *gin.Context, clientType string) {
 	conn, err := pkg.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -76,10 +74,12 @@ func handleCWs(c *gin.Context, clientType string) {
 	handleMessages(client)
 }
 
+// HandleWsSensor function to handle sensor WebSocket connections
 func (h *handlers) HandleWsSensor(c *gin.Context) {
 	handleCWs(c, "sensor")
 }
 
+// HandleWsSystem function to handle system WebSocket connections
 func (h *handlers) HandleWsSystem(c *gin.Context) {
 	handleCWs(c, "system")
 }
