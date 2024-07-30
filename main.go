@@ -24,7 +24,7 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	r.POST("/data", middleware.AuthMiddleware("user", "admin", "superadmin"), handlers.CreateData)
 	r.GET("/ws/sensor/:username", handlers.HandleWsSensor)
 	r.GET("/ws/system/:username", handlers.HandleWsSystem)
-	r.GET("/data", middleware.AuthMiddleware("user", "admin"), handlers.GetData)
+	r.GET("/data", handlers.GetData)
 	r.GET("/reportday", middleware.AuthMiddleware("user", "admin"), handlers.GetDataByDay)
 	r.POST("/connect", handlers.SuccessConnectedDevice)
 	r.POST("/sysinfo", handlers.GetSystemInfo)
