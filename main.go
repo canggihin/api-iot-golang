@@ -21,6 +21,7 @@ func router(r *gin.Engine, influxdb influxdb2.Client) {
 	handlers := handlers.NewHandler(service)
 
 	r.POST("/data", handlers.CreateData)
+	r.POST("/model", handlers.GetModelResult)
 	r.GET("/ws/sensor", handlers.HandleWsSensor)
 	r.GET("/ws/system", handlers.HandleWsSystem)
 	r.GET("/data", handlers.GetData)

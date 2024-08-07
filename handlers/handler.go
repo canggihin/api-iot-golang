@@ -158,3 +158,33 @@ func (h *handlers) GetSystemInfo(c *gin.Context) {
 		"data": data,
 	})
 }
+
+func (h *handlers) GetModelResult(c *gin.Context) {
+	var inputData []float32
+	if err := c.ShouldBindJSON(&inputData); err != nil {
+		c.JSON(400, gin.H{
+			"code": http.StatusBadRequest,
+			"msg":  "Bad Request",
+		})
+		return
+	}
+
+	data, err := h.services.GetModelResult(context.Background(), inputData)
+	if err != nil {
+		if err.Error() == "data not found" {
+			c.JSON(404, gin.H{
+				"code": http.StatusNotFound,
+				"msg":  "Data Not Found",
+			})
+			return
+		}
+		log.Println(err)
+		c.JSON(500, gin.H{
+			"code": http.StatusInternalServerError,
+			"msg":  "Internal Server Error",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"prediction": data})
+}

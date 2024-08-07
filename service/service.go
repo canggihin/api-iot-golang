@@ -7,6 +7,8 @@ import (
 	"mqtt-golang-rainfall-prediction/repository"
 	"sort"
 	"time"
+
+	"github.com/mattn/go-tflite"
 )
 
 type Service interface {
@@ -14,6 +16,7 @@ type Service interface {
 	GetData(ctx context.Context) ([]models.SensorData, error)
 	GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, error)
 	ProsesMessage(ctx context.Context, data models.SystemInfo) (models.SystemInfo, error)
+	GetModelResult(ctx context.Context, input []float32) (float32, error)
 }
 
 type service struct {
@@ -80,4 +83,36 @@ func (s *service) GetDataByDay(ctx context.Context) ([]models.SensorDataByDay, e
 	})
 
 	return data, nil
+}
+
+func (s *service) GetModelResult(ctx context.Context, input []float32) (float32, error) {
+	model := tflite.NewModelFromFile("../model_lstm.tflite")
+	if model == nil {
+		return 0, errors.New("failed to load model")
+	}
+	defer model.Delete()
+
+	options := tflite.NewInterpreterOptions()
+	interpretter := tflite.NewInterpreter(model, options)
+
+	if interpretter == nil {
+		return 0, errors.New("failed to create interpreter")
+	}
+	defer interpretter.Delete()
+
+	interpretter.AllocateTensors()
+
+	inputTensor := interpretter.GetInputTensor(0)
+
+	inputTensor.CopyFromBuffer(input)
+
+	interpretter.Invoke()
+
+	outputTensor := interpretter.GetOutputTensor(0)
+	output := make([]float32, outputTensor.Dim(1))
+
+	outputTensor.CopyToBuffer(&output[0])
+
+	return output[0], nil
+
 }
