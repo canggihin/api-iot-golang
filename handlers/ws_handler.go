@@ -20,7 +20,24 @@ func handleMessages(client *pkg.Client) {
 			return // Exit the loop and let defer clean up
 		}
 		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
+		
 
+		// Reset the timer on message receipt
+		client.Timer.Reset(60 * time.Second)
+	}
+}
+
+// handleMessages function to handle incoming WebSocket messages
+func handleMessagesModel(client *pkg.Client) {
+	for {
+		_, msg, err := client.Conn.ReadMessage()
+		if err != nil {
+			fmt.Printf("%s Data read error: %v\n", client.Type, err)
+			return // Exit the loop and let defer clean up
+		}
+		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
+
+		client.Conn.WriteMessage(websocket.TextMessage, string(msg))
 		// Reset the timer on message receipt
 		client.Timer.Reset(60 * time.Second)
 	}
@@ -82,4 +99,9 @@ func (h *handlers) HandleWsSensor(c *gin.Context) {
 // HandleWsSystem function to handle system WebSocket connections
 func (h *handlers) HandleWsSystem(c *gin.Context) {
 	handleCWs(c, "system")
+}
+
+// HandleWsSystem function to handle system WebSocket connections
+func (h *handlers) HandleWsModel(c *gin.Context) {
+	handleMessagesModel(c, "system")
 }
