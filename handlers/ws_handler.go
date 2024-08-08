@@ -20,7 +20,7 @@ func handleMessages(client *pkg.Client) {
 			return // Exit the loop and let defer clean up
 		}
 		fmt.Printf("Received %s Data: %s\n", client.Type, string(msg))
-
+		pkg.BroadcastToSensors(msg)
 		// Reset the timer on message receipt
 		client.Timer.Reset(60 * time.Second)
 	}
